@@ -178,8 +178,8 @@ class PythonActionWrapper(object):
         self._user = user
         self._parent_args = parent_args or []
         self._log_level = log_level
-        self._max_memory = max_memory
-        self._max_output_size = max_output_size
+        self._max_memory = max_memory  # in MB
+        self._max_output_size = max_output_size  # in MB
 
         self._class_name = None
         self._logger = logging.getLogger('PythonActionWrapper')
@@ -199,7 +199,7 @@ class PythonActionWrapper(object):
 
     def run(self):
         # limit the memory of the action
-        limit_memory(self._max_memory * 1024)
+        limit_memory(self._max_memory * 1024 * 1024)
 
         try:
             action = self._get_action_instance()
@@ -240,7 +240,7 @@ class PythonActionWrapper(object):
             except Exception:
                 print_output = str(action_output)
 
-            if self._max_output_size and sys.getsizeof(print_output) > self._max_output_size * 1024:
+            if self._max_output_size and sys.getsizeof(print_output) > self._max_output_size * 1024 * 1024:
                 sys.stderr.write(f'The action has reached the maximum allowable output size.\n'
                                  f'Maximum allowable output size: {self._max_output_size}MB.\n')
                 sys.exit(PYTHON_RUNNER_INVALID_ACTION_STATUS_EXIT_CODE)
