@@ -145,7 +145,8 @@ def _process(G, name, value):
         LOG.debug("Dependencies: %s", dependencies)
         if dependencies:
             for dependency in dependencies:
-                G.add_edge(dependency, name)
+                if G.has_node(dependency):
+                    G.add_edge(dependency, name)
     else:
         G.add_node(name, value=value)
 
@@ -213,7 +214,10 @@ def _render(node, render_context):
 
         LOG.debug("Rendering node: %s with context: %s", node, render_context)
 
-        result = ENV.from_string(str(node["template"])).render(render_context)
+        try:
+            result = ENV.from_string(str(node["template"])).render(render_context)
+        except:
+            result = str(node["template"])
 
         LOG.debug("Render complete: %s", result)
 
